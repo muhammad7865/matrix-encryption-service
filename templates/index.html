@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix-Based Encryption System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .matrix-animation {
+            background: linear-gradient(45deg, #1e3a8a, #3b82f6);
+            background-size: 400% 400%;
+            animation: gradient 3s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="matrix-animation text-white py-8">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold text-center mb-2">Matrix-Based Encryption System</h1>
+            <p class="text-center text-blue-100">Parallel Computing Enhanced Cryptographic Operations</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Encryption/Decryption Section -->
+        <div class="grid lg:grid-cols-2 gap-8 mb-12">
+            <!-- Encryption Panel -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Text Encryption</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Input Text</label>
+                        <textarea 
+                            id="plaintext" 
+                            rows="4" 
+                            class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter text to encrypt..."
+                        ></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Encryption Method</label>
+                        <select id="encryptMethod" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                            <option value="serial">Serial Processing</option>
+                            <option value="parallel">Parallel Processing</option>
+                        </select>
+                    </div>
+                    
+                    <button 
+                        id="encryptBtn" 
+                        class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition duration-200 font-medium"
+                    >
+                        Encrypt Text
+                    </button>
+                    
+                    <div id="encryptResult" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Encrypted Data</label>
+                        <textarea 
+                            id="encryptedText" 
+                            rows="3" 
+                            class="w-full p-3 border border-gray-300 rounded-md bg-gray-50" 
+                            readonly
+                        ></textarea>
+                        <p id="encryptTime" class="text-sm text-gray-600 mt-2"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decryption Panel -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Text Decryption</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Encrypted Data</label>
+                        <textarea 
+                            id="encryptedInput" 
+                            rows="4" 
+                            class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Paste encrypted data here..."
+                        ></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Decryption Method</label>
+                        <select id="decryptMethod" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                            <option value="serial">Serial Processing</option>
+                            <option value="parallel">Parallel Processing</option>
+                        </select>
+                    </div>
+                    
+                    <button 
+                        id="decryptBtn" 
+                        class="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 transition duration-200 font-medium"
+                    >
+                        Decrypt Text
+                    </button>
+                    
+                    <div id="decryptResult" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Decrypted Text</label>
+                        <textarea 
+                            id="decryptedText" 
+                            rows="3" 
+                            class="w-full p-3 border border-gray-300 rounded-md bg-gray-50" 
+                            readonly
+                        ></textarea>
+                        <p id="decryptTime" class="text-sm text-gray-600 mt-2"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Analysis Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Performance Analysis</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Benchmark Text</label>
+                    <textarea 
+                        id="benchmarkText" 
+                        rows="4" 
+                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter text for performance benchmarking..."
+                    >This is a comprehensive test of the matrix-based encryption system. The system uses parallel computing techniques to enhance performance through distributed processing across multiple CPU cores. This benchmark will demonstrate the performance improvements achieved through parallelization compared to traditional serial processing methods.</textarea>
+                    
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Iterations</label>
+                        <input 
+                            type="number" 
+                            id="iterations" 
+                            value="10" 
+                            min="1" 
+                            max="50" 
+                            class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+                    
+                    <button 
+                        id="benchmarkBtn" 
+                        class="w-full mt-4 bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 transition duration-200 font-medium"
+                    >
+                        Run Performance Benchmark
+                    </button>
+                </div>
+                
+                <div>
+                    <canvas id="performanceChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+            
+            <div id="benchmarkResults" class="hidden mt-6">
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-blue-800">Serial Processing</h3>
+                        <p id="serialTime" class="text-2xl font-bold text-blue-600"></p>
+                        <p class="text-sm text-blue-600">Average Time (seconds)</p>
+                    </div>
+                    
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-green-800">Parallel Processing</h3>
+                        <p id="parallelTime" class="text-2xl font-bold text-green-600"></p>
+                        <p class="text-sm text-green-600">Average Time (seconds)</p>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-purple-800">Performance Gain</h3>
+                        <p id="speedup" class="text-2xl font-bold text-purple-600"></p>
+                        <p class="text-sm text-purple-600">Speedup Factor</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <p id="systemInfo" class="text-sm text-gray-600"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Algorithm Information -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Algorithm Overview</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-gray-700">Matrix Encryption Process</h3>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-600">
+                        <li>Convert plaintext to ASCII matrix</li>
+                        <li>Generate invertible key matrix</li>
+                        <li>Multiply text matrix by key matrix</li>
+                        <li>Store encrypted matrix result</li>
+                    </ol>
+                    
+                    <h3 class="text-lg font-semibold mb-3 mt-6 text-gray-700">Parallel Processing Benefits</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Matrix operations distributed across CPU cores</li>
+                        <li>Reduced computation time for large texts</li>
+                        <li>Scalable performance with hardware</li>
+                        <li>Maintains encryption security</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-gray-700">Technical Specifications</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Matrix Size:</span>
+                            <span class="font-medium">8x8</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Key Generation:</span>
+                            <span class="font-medium">Random Invertible</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Processing Method:</span>
+                            <span class="font-medium">Chunk-based Parallel</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Character Encoding:</span>
+                            <span class="font-medium">ASCII</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let encryptedData = null;
+        let performanceChart = null;
+
+        // Initialize chart
+        function initChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            performanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Serial Processing', 'Parallel Processing'],
+                    datasets: [{
+                        label: 'Processing Time (seconds)',
+                        data: [0, 0],
+                        backgroundColor: ['#3b82f6', '#10b981'],
+                        borderColor: ['#1e40af', '#059669'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Time (seconds)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Performance Comparison'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Encrypt text
+        document.getElementById('encryptBtn').addEventListener('click', async function() {
+            const text = document.getElementById('plaintext').value;
+            const method = document.getElementById('encryptMethod').value;
+            
+            if (!text.trim()) {
+                alert('Please enter text to encrypt');
+                return;
+            }
+            
+            this.classList.add('loading');
+            this.textContent = 'Encrypting...';
+            
+            try {
+                const response = await fetch('/api/encrypt/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text, method })
+                });
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    alert('Error: ' + result.error);
+                    return;
+                }
+                
+                encryptedData = result;
+                document.getElementById('encryptedText').value = result.encrypted;
+                document.getElementById('encryptTime').textContent = 
+                    `Encryption completed in ${result.encryption_time.toFixed(4)} seconds using ${result.method} processing`;
+                document.getElementById('encryptResult').classList.remove('hidden');
+                
+                // Auto-fill decryption input
+                document.getElementById('encryptedInput').value = result.encrypted;
+                
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                this.classList.remove('loading');
+                this.textContent = 'Encrypt Text';
+            }
+        });
+
+        // Decrypt text
+        document.getElementById('decryptBtn').addEventListener('click', async function() {
+            const encrypted = document.getElementById('encryptedInput').value;
+            const method = document.getElementById('decryptMethod').value;
+            
+            if (!encrypted.trim()) {
+                alert('Please enter encrypted data to decrypt');
+                return;
+            }
+            
+            // Use stored encryption data if available
+            let requestData;
+            if (encryptedData && encrypted === encryptedData.encrypted) {
+                requestData = {
+                    encrypted: encryptedData.encrypted,
+                    matrix_shape: encryptedData.matrix_shape,
+                    method: method
+                };
+            } else {
+                alert('Please encrypt text first or ensure encrypted data is valid');
+                return;
+            }
+            
+            this.classList.add('loading');
+            this.textContent = 'Decrypting...';
+            
+            try {
+                const response = await fetch('/api/decrypt/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    alert('Error: ' + result.error);
+                    return;
+                }
+                
+                document.getElementById('decryptedText').value = result.decrypted;
+                document.getElementById('decryptTime').textContent = 
+                    `Decryption completed in ${result.decryption_time.toFixed(4)} seconds using ${result.method} processing`;
+                document.getElementById('decryptResult').classList.remove('hidden');
+                
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                this.classList.remove('loading');
+                this.textContent = 'Decrypt Text';
+            }
+        });
+
+        // Run benchmark
+        document.getElementById('benchmarkBtn').addEventListener('click', async function() {
+            const text = document.getElementById('benchmarkText').value;
+            const iterations = parseInt(document.getElementById('iterations').value);
+            
+            if (!text.trim()) {
+                alert('Please enter text for benchmarking');
+                return;
+            }
+            
+            this.classList.add('loading');
+            this.textContent = 'Running Benchmark...';
+            
+            try {
+                const response = await fetch('/api/benchmark/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text, iterations })
+                });
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    alert('Error: ' + result.error);
+                    return;
+                }
+                
+                const benchmark = result.benchmark_results;
+                
+                // Update display
+                document.getElementById('serialTime').textContent = benchmark.serial_avg.toFixed(4);
+                document.getElementById('parallelTime').textContent = benchmark.parallel_avg.toFixed(4);
+                document.getElementById('speedup').textContent = benchmark.speedup.toFixed(2) + 'x';
+                document.getElementById('systemInfo').textContent = 
+                    `System: ${benchmark.cpu_count} CPU cores | Text length: ${result.text_length} characters | Iterations: ${result.iterations}`;
+                
+                // Update chart
+                performanceChart.data.datasets[0].data = [benchmark.serial_avg, benchmark.parallel_avg];
+                performanceChart.update();
+                
+                document.getElementById('benchmarkResults').classList.remove('hidden');
+                
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                this.classList.remove('loading');
+                this.textContent = 'Run Performance Benchmark';
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initChart();
+        });
+    </script>
+</body>
+</html>
