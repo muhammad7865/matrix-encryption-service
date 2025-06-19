@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parallelized Encryption-as-a-Service | Matrix Transformations</title>
+    <title>Matrix Encryption Service | Advanced Parallel Computing</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        html {
-            scroll-behavior: smooth;
+        * {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
         
         .service-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             background-size: 400% 400%;
-            animation: gradient 8s ease infinite;
+            animation: gradient 12s ease infinite;
         }
         
         @keyframes gradient {
@@ -23,51 +24,83 @@
             50% { background-position: 100% 50%; }
         }
         
-        .loading { 
-            opacity: 0.6; 
-            pointer-events: none; 
-        }
-        
-        .algorithm-card { 
-            transition: all 0.3s ease; 
+        .chart-container {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
         }
-        
-        .algorithm-card:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
+
+        .metric-card {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
         }
-        
-        .matrix-bg {
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+
+        .metric-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
-        
-        .code-font {
-            font-family: 'Courier New', monospace;
+
+        .worker-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: workerPulse 2s ease-in-out infinite;
         }
-        
-        .pulse-animation {
-            animation: pulse 2s infinite;
+
+        .worker-indicator.active {
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
         }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+        .worker-indicator.inactive {
+            background: #6b7280;
         }
-        
-        .feature-icon {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+
+        @keyframes workerPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        .thread-timeline-bar {
+            height: 30px;
+            border-radius: 6px;
+            margin: 2px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thread-timeline-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen matrix-bg">
-    <!-- Navigation -->
-    <nav class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+<body class="bg-gray-50 min-h-screen">
+       <!-- Navigation -->
+       <nav class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-3">
@@ -250,8 +283,8 @@
 
     <!-- Service Configuration -->
     <section class="py-8 bg-white">
-        <div class="container mx-auto px-4">
-            <div class="bg-white rounded-xl shadow-lg p-8 border">
+        <div class="container mx-auto px-6">
+            <div class="chart-container rounded-2xl p-8">
                 <div class="flex items-center mb-6">
                     <i class="fas fa-cogs text-2xl text-blue-600 mr-3"></i>
                     <h2 class="text-2xl font-semibold text-gray-800">Service Configuration</h2>
@@ -259,10 +292,10 @@
                 
                 <div class="grid md:grid-cols-4 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <i class="fas fa-algorithm mr-2"></i>Algorithm
                         </label>
-                        <select id="algorithm" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <select id="algorithm" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="hill_cipher">Hill Cipher</option>
                             <option value="matrix_transform">Matrix Transformation</option>
                             <option value="advanced_matrix">Advanced Matrix</option>
@@ -270,20 +303,20 @@
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <i class="fas fa-microchip mr-2"></i>Processing Method
                         </label>
-                        <select id="processingMethod" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <select id="processingMethod" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="parallel">Parallel Processing</option>
                             <option value="serial">Serial Processing</option>
                         </select>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <i class="fas fa-users mr-2"></i>Worker Threads
                         </label>
-                        <select id="numWorkers" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <select id="numWorkers" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="1">1 Worker</option>
                             <option value="2">2 Workers</option>
                             <option value="4" selected>4 Workers</option>
@@ -292,14 +325,27 @@
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <i class="fas fa-th mr-2"></i>Matrix Size
                         </label>
-                        <select id="matrixSize" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <select id="matrixSize" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="4">4x4 Matrix</option>
                             <option value="8" selected>8x8 Matrix</option>
                             <option value="16">16x16 Matrix</option>
                         </select>
+                    </div>
+                </div>
+
+                <!-- Worker Status Indicator -->
+                <div class="mt-6 p-4 bg-gray-50 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fas fa-server text-blue-600 mr-2"></i>
+                            <span class="font-semibold text-gray-700">Active Workers:</span>
+                        </div>
+                        <div id="workerIndicators" class="flex items-center">
+                            <!-- Worker indicators will be populated by JavaScript -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -307,15 +353,15 @@
     </section>
 
     <!-- Main Service Interface -->
-    <main class="container mx-auto px-4 py-8">
+    <main class="container mx-auto px-6 py-8">
         <!-- Service Tabs -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div class="border-b border-gray-200 bg-gray-50">
+        <div class="chart-container rounded-2xl shadow-2xl overflow-hidden">
+            <div class="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
                 <nav class="flex space-x-8 px-8">
-                    <button class="service-tab py-4 px-1 border-b-2 border-blue-500 font-medium text-blue-600 flex items-center" data-tab="text">
+                    <button class="service-tab py-4 px-2 border-b-2 border-blue-500 font-semibold text-blue-600 flex items-center" data-tab="text">
                         <i class="fas fa-lock mr-2"></i>Text Encryption
                     </button>
-                    <button class="service-tab py-4 px-1 border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 flex items-center" data-tab="benchmark">
+                    <button class="service-tab py-4 px-2 border-b-2 border-transparent font-semibold text-gray-500 hover:text-gray-700 flex items-center" data-tab="benchmark">
                         <i class="fas fa-chart-bar mr-2"></i>Performance Analysis
                     </button>
                 </nav>
@@ -325,7 +371,7 @@
             <div id="text-tab" class="tab-content p-8">
                 <div class="grid lg:grid-cols-2 gap-8">
                     <!-- Encryption Panel -->
-                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6">
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl p-6">
                         <div class="flex items-center mb-4">
                             <i class="fas fa-shield-alt text-2xl text-blue-600 mr-3"></i>
                             <h3 class="text-xl font-semibold text-gray-800">Text Encryption Service</h3>
@@ -354,7 +400,7 @@
                                 <textarea 
                                     id="encryptedText" 
                                     rows="4" 
-                                    class="w-full p-4 border border-gray-300 rounded-lg bg-gray-50 code-font text-sm resize-none" 
+                                    class="w-full p-4 border border-gray-300 rounded-lg bg-gray-50 font-mono text-sm resize-none" 
                                     readonly
                                 ></textarea>
                                 <div id="encryptStats" class="mt-3 p-3 bg-blue-50 rounded-lg text-sm"></div>
@@ -363,7 +409,7 @@
                     </div>
 
                     <!-- Decryption Panel -->
-                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6">
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl p-6">
                         <div class="flex items-center mb-4">
                             <i class="fas fa-unlock-alt text-2xl text-green-600 mr-3"></i>
                             <h3 class="text-xl font-semibold text-gray-800">Text Decryption Service</h3>
@@ -374,7 +420,7 @@
                                 <textarea 
                                     id="encryptedInput" 
                                     rows="6" 
-                                    class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent code-font text-sm resize-none"
+                                    class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono text-sm resize-none"
                                     placeholder="Paste encrypted data here..."
                                 ></textarea>
                             </div>
@@ -406,11 +452,11 @@
             <div id="benchmark-tab" class="tab-content p-8 hidden">
                 <div class="flex items-center mb-6">
                     <i class="fas fa-tachometer-alt text-2xl text-indigo-600 mr-3"></i>
-                    <h3 id="performance" class="text-2xl font-semibold text-gray-800">Performance Analysis & Benchmarking</h3>
+                    <h3 class="text-2xl font-semibold text-gray-800">Performance Analysis & Benchmarking</h3>
                 </div>
                 
                 <div class="grid lg:grid-cols-2 gap-8">
-                    <div class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-6">
+                    <div class="bg-gradient-to-br from-purple-50 to-indigo-100 rounded-xl p-6">
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Benchmark Text</label>
@@ -418,7 +464,7 @@
                                     id="benchmarkText" 
                                     rows="6" 
                                     class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                                >This is a comprehensive performance benchmark for the parallelized encryption-as-a-service platform. The system demonstrates matrix-based encryption algorithms with distributed computing capabilities across multiple processing units.</textarea>
+                                >This is a comprehensive performance benchmark for the parallelized encryption-as-a-service platform. The system demonstrates matrix-based encryption algorithms with distributed computing capabilities across multiple processing units. This extended text will help demonstrate the performance differences between serial and parallel processing methods more effectively. We need sufficient text length to show meaningful parallel processing benefits and overhead analysis.</textarea>
                             </div>
                             
                             <div>
@@ -426,9 +472,9 @@
                                 <input 
                                     type="number" 
                                     id="iterations" 
-                                    value="10" 
-                                    min="1" 
-                                    max="50" 
+                                    value="5" 
+                                    min="3" 
+                                    max="1000" 
                                     class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                 >
                             </div>
@@ -443,19 +489,109 @@
                         </div>
                     </div>
                     
-                    <div class="bg-white rounded-xl border p-6">
+                    <div class="chart-container rounded-xl p-6">
                         <canvas id="performanceChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Processing Method Visualization -->
+                <div id="processingVisualization" class="hidden mt-8">
+                    <h4 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-microchip mr-2 text-blue-600"></i>
+                        Processing Method Comparison
+                    </h4>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Serial Processing Box -->
+                        <div class="metric-card rounded-xl p-6">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                    <i class="fas fa-microchip text-blue-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h5 class="text-lg font-semibold text-blue-600">Serial Processing</h5>
+                                    <p class="text-sm text-gray-600">Single-threaded execution</p>
+                                </div>
+                            </div>
+                            <div id="serialMetrics" class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Average Time:</span>
+                                    <span class="font-semibold" id="serialTime">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Speedup:</span>
+                                    <span class="font-semibold" id="serialSpeedup">1.00x</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Efficiency:</span>
+                                    <span class="font-semibold" id="serialEfficiency">100.0%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Workers:</span>
+                                    <span class="font-semibold">1</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Parallel Processing Box -->
+                        <div class="metric-card rounded-xl p-6">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                                    <i class="fas fa-server text-green-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h5 class="text-lg font-semibold text-green-600">Parallel Processing</h5>
+                                    <p class="text-sm text-gray-600">Multi-threaded execution</p>
+                                </div>
+                            </div>
+                            <div id="parallelMetrics" class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Average Time:</span>
+                                    <span class="font-semibold" id="parallelTime">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Speedup:</span>
+                                    <span class="font-semibold" id="parallelSpeedup">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Efficiency:</span>
+                                    <span class="font-semibold" id="parallelEfficiency">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Workers:</span>
+                                    <span class="font-semibold" id="parallelWorkers">-</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
                 <div id="benchmarkResults" class="hidden mt-8">
                     <h4 class="text-xl font-semibold mb-6 flex items-center">
                         <i class="fas fa-chart-line mr-2 text-purple-600"></i>
-                        Benchmark Results
+                        Detailed Performance Metrics
                     </h4>
-                    <div id="performanceMetrics" class="grid md:grid-cols-4 gap-4 mb-6"></div>
                     
-                    <div class="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div class="chart-container rounded-xl p-4">
+                            <canvas id="iterationChart" height="400"></canvas>
+                        </div>
+                        <div class="chart-container rounded-xl p-4">
+                            <canvas id="speedupChart" height="400"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Thread Timeline Visualization -->
+                    <div class="chart-container rounded-xl p-6 mt-6">
+                        <h5 class="font-semibold mb-4 flex items-center">
+                            <i class="fas fa-clock mr-2 text-indigo-600"></i>
+                            Thread Execution Timeline (Latest Iteration)
+                        </h5>
+                        <div id="threadTimeline" class="space-y-2">
+                            <!-- Thread timeline will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 mt-6">
                         <h5 class="font-semibold mb-3 flex items-center">
                             <i class="fas fa-info-circle mr-2 text-blue-600"></i>
                             System Information
@@ -467,50 +603,10 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-3 gap-8">
-                <div>
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-matrix-org text-white"></i>
-                        </div>
-                        <h3 class="text-xl font-bold">Matrix Encryption</h3>
-                    </div>
-                    <p class="text-gray-400">Advanced parallelized encryption service using matrix transformations and distributed computing.</p>
-                </div>
-                
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Technologies</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><i class="fab fa-python mr-2"></i>Python & Django</li>
-                        <li><i class="fas fa-calculator mr-2"></i>NumPy & SciPy</li>
-                        <li><i class="fas fa-microchip mr-2"></i>Multiprocessing</li>
-                        <li><i class="fab fa-js-square mr-2"></i>JavaScript & Chart.js</li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Features</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><i class="fas fa-bolt mr-2"></i>Parallel Processing</li>
-                        <li><i class="fas fa-shield-alt mr-2"></i>Multiple Algorithms</li>
-                        <li><i class="fas fa-chart-line mr-2"></i>Performance Analytics</li>
-                        <li><i class="fas fa-cloud mr-2"></i>Service-Oriented Architecture</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2024 Matrix Encryption Service. Built with Django and modern web technologies.</p>
-            </div>
-        </div>
-    </footer>
-
     <script>
         let encryptedData = null;
         let performanceChart = null;
+        let benchmarkRunning = false;
 
         // Tab switching
         document.querySelectorAll('.service-tab').forEach(tab => {
@@ -533,9 +629,33 @@
             });
         });
 
+        // Update worker indicators
+        function updateWorkerIndicators() {
+            const numWorkers = parseInt(document.getElementById('numWorkers').value);
+            const processingMethod = document.getElementById('processingMethod').value;
+            const indicatorsContainer = document.getElementById('workerIndicators');
+            
+            indicatorsContainer.innerHTML = '';
+            
+            const maxWorkers = 8;
+            for (let i = 0; i < maxWorkers; i++) {
+                const indicator = document.createElement('div');
+                indicator.className = `worker-indicator ${i < numWorkers && processingMethod === 'parallel' ? 'active' : 'inactive'}`;
+                indicator.title = `Worker ${i + 1}`;
+                indicatorsContainer.appendChild(indicator);
+            }
+            
+            const statusText = document.createElement('span');
+            statusText.className = 'ml-3 text-sm font-medium text-gray-600';
+            statusText.textContent = processingMethod === 'parallel' ? 
+                `${numWorkers} workers active` : '1 worker active (serial mode)';
+            indicatorsContainer.appendChild(statusText);
+        }
+
         // Initialize performance chart
         function initChart() {
             const ctx = document.getElementById('performanceChart').getContext('2d');
+            
             performanceChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -543,39 +663,41 @@
                     datasets: [{
                         label: 'Processing Time (seconds)',
                         data: [],
-                        backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b'],
-                        borderColor: ['#1e40af', '#059669', '#7c3aed', '#d97706'],
+                        backgroundColor: ['rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)'],
+                        borderColor: ['#3b82f6', '#10b981'],
                         borderWidth: 2,
                         borderRadius: 8,
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Performance Comparison Across Different Worker Counts',
-                            font: { size: 16, weight: 'bold' }
+                            text: 'Performance Comparison: Serial vs Parallel Processing',
+                            font: { size: 16, weight: 'bold' },
+                            color: '#374151',
+                            padding: 20
                         },
-                        legend: {
-                            display: false
-                        }
+                        legend: { display: false }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Time (seconds)',
-                                font: { weight: 'bold' }
-                            },
-                            grid: {
-                                color: 'rgba(0,0,0,0.1)'
+                                text: 'Processing Time (seconds)',
+                                font: { weight: 'bold', size: 12 },
+                                color: '#374151'
                             }
                         },
                         x: {
-                            grid: {
-                                display: false
+                            title: {
+                                display: true,
+                                text: 'Processing Method',
+                                font: { weight: 'bold', size: 12 },
+                                color: '#374151'
                             }
                         }
                     }
@@ -612,8 +734,8 @@
                 return;
             }
             
-            this.classList.add('loading');
             this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Encrypting...';
+            this.disabled = true;
             
             try {
                 const response = await fetch('/api/encrypt/text/', {
@@ -645,7 +767,7 @@
                         <div><strong><i class="fas fa-id-badge mr-1"></i>Job ID:</strong> ${result.job_id}</div>
                         <div><strong><i class="fas fa-algorithm mr-1"></i>Algorithm:</strong> ${result.algorithm}</div>
                         <div><strong><i class="fas fa-clock mr-1"></i>Time:</strong> ${result.processing_time.toFixed(4)}s</div>
-                        <div><strong><i class="fas fa-users mr-1"></i>Workers:</strong> ${result.workers_used}</div>
+                        <div><strong><i class="fas fa-users mr-1"></i>Workers:</strong> ${result.workers_used} (requested: ${result.workers_requested})</div>
                         <div><strong><i class="fas fa-th mr-1"></i>Matrix:</strong> ${result.matrix_size}x${result.matrix_size}</div>
                         <div><strong><i class="fas fa-microchip mr-1"></i>Method:</strong> ${result.processing_method}</div>
                     </div>
@@ -658,8 +780,8 @@
             } catch (error) {
                 alert('Error: ' + error.message);
             } finally {
-                this.classList.remove('loading');
                 this.innerHTML = '<i class="fas fa-lock mr-2"></i>Encrypt Text';
+                this.disabled = false;
             }
         });
 
@@ -691,8 +813,8 @@
                 return;
             }
             
-            this.classList.add('loading');
             this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Decrypting...';
+            this.disabled = true;
             
             try {
                 const response = await fetch('/api/decrypt/text/', {
@@ -716,7 +838,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div><strong><i class="fas fa-algorithm mr-1"></i>Algorithm:</strong> ${result.algorithm}</div>
                         <div><strong><i class="fas fa-clock mr-1"></i>Time:</strong> ${result.processing_time.toFixed(4)}s</div>
-                        <div><strong><i class="fas fa-users mr-1"></i>Workers:</strong> ${result.workers_used}</div>
+                        <div><strong><i class="fas fa-users mr-1"></i>Workers:</strong> ${result.workers_used} (requested: ${result.workers_requested})</div>
                         <div><strong><i class="fas fa-microchip mr-1"></i>Method:</strong> ${result.processing_method}</div>
                     </div>
                 `;
@@ -725,25 +847,32 @@
             } catch (error) {
                 alert('Error: ' + error.message);
             } finally {
-                this.classList.remove('loading');
                 this.innerHTML = '<i class="fas fa-unlock mr-2"></i>Decrypt Text';
+                this.disabled = false;
             }
         });
 
         // Performance benchmark
         document.getElementById('benchmarkBtn').addEventListener('click', async function() {
+            if (benchmarkRunning) {
+                alert('Benchmark is already running. Please wait...');
+                return;
+            }
+            
             const text = document.getElementById('benchmarkText').value;
             const algorithm = document.getElementById('algorithm').value;
             const iterations = parseInt(document.getElementById('iterations').value);
             const matrixSize = parseInt(document.getElementById('matrixSize').value);
+            const numWorkers = parseInt(document.getElementById('numWorkers').value);
             
             if (!text.trim()) {
                 alert('Please enter text for benchmarking');
                 return;
             }
             
-            this.classList.add('loading');
-            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Running Benchmark...';
+            benchmarkRunning = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Running Benchmark... Please wait';
+            this.disabled = true;
             
             try {
                 const response = await fetch('/api/benchmark/', {
@@ -755,8 +884,9 @@
                     body: JSON.stringify({
                         text: text,
                         algorithm: algorithm,
-                        iterations: iterations,
-                        matrix_size: matrixSize
+                        iterations: Math.min(iterations, 10),
+                        matrix_size: matrixSize,
+                        num_workers: numWorkers
                     })
                 });
                 
@@ -768,62 +898,220 @@
                 }
                 
                 const benchmark = result.benchmark_results;
+                let serialResult = benchmark.serial;
+                let parallelResult = benchmark.parallel;
                 
-                // Update chart
-                const labels = [];
-                const data = [];
-                const colors = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b'];
-                
-                Object.keys(benchmark).forEach((key, index) => {
-                    if (key === 'serial') {
-                        labels.push('Serial');
-                        data.push(benchmark[key].avg_time);
-                    } else if (key.startsWith('parallel_')) {
-                        const workers = benchmark[key].workers;
-                        labels.push(`${workers} Workers`);
-                        data.push(benchmark[key].avg_time);
-                    }
-                });
+                // Update main performance chart
+                const labels = ['Serial Processing', 'Parallel Processing'];
+                const data = [
+                    serialResult ? serialResult.avg_time : 0,
+                    parallelResult ? parallelResult.avg_time : 0
+                ];
                 
                 performanceChart.data.labels = labels;
                 performanceChart.data.datasets[0].data = data;
-                performanceChart.data.datasets[0].backgroundColor = colors.slice(0, data.length);
-                performanceChart.update();
+                performanceChart.update('active');
                 
-                // Update metrics display
-                const metricsHtml = Object.keys(benchmark).map((key, index) => {
-                    const result = benchmark[key];
-                    const isSerial = key === 'serial';
-                    const workers = isSerial ? 1 : result.workers;
-                    const speedup = result.speedup ? result.speedup.toFixed(2) + 'x' : 'N/A';
-                    const efficiency = result.efficiency ? (result.efficiency * 100).toFixed(1) + '%' : 'N/A';
-                    const color = isSerial ? 'blue' : workers === 2 ? 'green' : workers === 4 ? 'purple' : 'orange';
+                // Update processing method visualization
+                document.getElementById('processingVisualization').classList.remove('hidden');
+                
+                // Update serial metrics
+                if (serialResult) {
+                    document.getElementById('serialTime').textContent = `${serialResult.avg_time.toFixed(4)}s`;
+                    document.getElementById('serialSpeedup').textContent = '1.00x';
+                    document.getElementById('serialEfficiency').textContent = '100.0%';
+                }
+                
+                // Update parallel metrics
+                if (parallelResult) {
+                    document.getElementById('parallelTime').textContent = `${parallelResult.avg_time.toFixed(4)}s`;
+                    document.getElementById('parallelSpeedup').textContent = `${parallelResult.speedup.toFixed(2)}x`;
+                    document.getElementById('parallelEfficiency').textContent = `${(parallelResult.efficiency * 100).toFixed(1)}%`;
+                    document.getElementById('parallelWorkers').textContent = parallelResult.workers.toString();
+                }
+                
+                // Create per-iteration chart
+                if (window.iterationChart && typeof window.iterationChart.destroy === 'function') {
+                    window.iterationChart.destroy();
+                }
+                const iterCtx = document.getElementById('iterationChart').getContext('2d');
+                const iterLabels = Array.from({length: iterations}, (_, i) => `Iteration ${i+1}`);
+                
+                window.iterationChart = new Chart(iterCtx, {
+                    type: 'line',
+                    data: {
+                        labels: iterLabels,
+                        datasets: [
+                            {
+                                label: 'Serial Processing',
+                                data: serialResult.per_iteration,
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#3b82f6',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 2,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Parallel Processing',
+                                data: parallelResult ? parallelResult.per_iteration : [],
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#10b981',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 2,
+                                pointRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            title: { 
+                                display: true, 
+                                text: 'Per-Iteration Performance Comparison',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20,
+                                    font: { size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: '#374151',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.parsed.y.toFixed(4)}s`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: { 
+                            y: { 
+                                beginAtZero: true, 
+                                title: { 
+                                    display: true, 
+                                    text: 'Time (seconds)',
+                                    font: { weight: 'bold', size: 12 }
+                                },
+                                grid: {
+                                    color: 'rgba(0,0,0,0.1)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Iteration Number',
+                                    font: { weight: 'bold', size: 12 }
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1500,
+                            easing: 'easeInOutQuart'
+                        }
+                    }
+                });
+
+                // Create speedup efficiency chart
+                if (window.speedupChart && typeof window.speedupChart.destroy === 'function') {
+                    window.speedupChart.destroy();
+                }
+                const speedupCtx = document.getElementById('speedupChart').getContext('2d');
+                
+                window.speedupChart = new Chart(speedupCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Efficiency Used', 'Efficiency Lost'],
+                        datasets: [{
+                            data: [
+                                parallelResult ? parallelResult.efficiency * 100 : 0,
+                                parallelResult ? (1 - parallelResult.efficiency) * 100 : 100
+                            ],
+                            backgroundColor: ['#10b981', '#e5e7eb'],
+                            borderWidth: 0,
+                            cutout: '70%'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `Parallel Efficiency: ${parallelResult ? (parallelResult.efficiency * 100).toFixed(1) : 0}%`,
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    font: { size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.label}: ${context.parsed.toFixed(1)}%`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Create thread timeline visualization
+                const timelineContainer = document.getElementById('threadTimeline');
+                timelineContainer.innerHTML = '';
+                
+                if (parallelResult && parallelResult.thread_times && parallelResult.thread_times.length > 0) {
+                    const latestIteration = parallelResult.thread_times[parallelResult.thread_times.length - 1];
+                    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'];
                     
-                    return `
-                        <div class="bg-white p-6 rounded-xl border shadow-sm">
-                            <div class="flex items-center mb-3">
-                                <div class="w-3 h-3 bg-${color}-500 rounded-full mr-2"></div>
-                                <h5 class="font-semibold text-gray-800">${isSerial ? 'Serial' : workers + ' Workers'}</h5>
-                            </div>
-                            <div class="text-3xl font-bold text-${color}-600 mb-2">${result.avg_time.toFixed(4)}s</div>
-                            <div class="text-sm text-gray-600 space-y-1">
-                                <div><i class="fas fa-rocket mr-1"></i>Speedup: ${speedup}</div>
-                                <div><i class="fas fa-percentage mr-1"></i>Efficiency: ${efficiency}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                    latestIteration.forEach((thread, index) => {
+                        const threadBar = document.createElement('div');
+                        threadBar.className = 'thread-timeline-bar';
+                        threadBar.style.backgroundColor = colors[index % colors.length];
+                        threadBar.style.width = `${Math.min(100, 20 + (thread.duration * 1000))}%`;
+                        threadBar.innerHTML = `
+                            <span>Thread ${thread.worker_id + 1}</span>
+                            <span class="ml-2 text-xs opacity-75">${(thread.duration * 1000).toFixed(1)}ms</span>
+                        `;
+                        timelineContainer.appendChild(threadBar);
+                    });
+                } else {
+                    timelineContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No thread timing data available</p>';
+                }
                 
-                document.getElementById('performanceMetrics').innerHTML = metricsHtml;
-                
+                // Update system information
                 document.getElementById('systemInfo').innerHTML = `
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div><strong><i class="fas fa-algorithm mr-1"></i>Algorithm:</strong> ${result.algorithm}</div>
-                        <div><strong><i class="fas fa-file-alt mr-1"></i>Text Length:</strong> ${result.text_length} characters</div>
+                        <div><strong><i class="fas fa-file-alt mr-1"></i>Text Length:</strong> ${result.text_length.toLocaleString()} characters</div>
                         <div><strong><i class="fas fa-redo mr-1"></i>Iterations:</strong> ${result.iterations}</div>
                         <div><strong><i class="fas fa-microchip mr-1"></i>CPU Cores:</strong> ${result.system_info.cpu_count}</div>
                         <div><strong><i class="fas fa-th mr-1"></i>Matrix Size:</strong> ${result.system_info.matrix_size}x${result.system_info.matrix_size}</div>
-                        <div><strong><i class="fas fa-server mr-1"></i>Platform:</strong> Django + Python</div>
+                        <div><strong><i class="fas fa-users mr-1"></i>Workers Used:</strong> ${result.requested_workers}</div>
+                        <div><strong><i class="fas fa-server mr-1"></i>Parallel Threshold:</strong> ${result.system_info.parallel_threshold.toLocaleString()}</div>
+                        <div><strong><i class="fas fa-chart-line mr-1"></i>Performance Gain:</strong> ${parallelResult ? `${((parallelResult.speedup - 1) * 100).toFixed(1)}%` : 'N/A'}</div>
                     </div>
                 `;
                 
@@ -831,58 +1119,22 @@
                 
             } catch (error) {
                 alert('Error: ' + error.message);
+                console.error('Benchmark error:', error);
             } finally {
-                this.classList.remove('loading');
+                benchmarkRunning = false;
                 this.innerHTML = '<i class="fas fa-rocket mr-2"></i>Run Performance Benchmark';
+                this.disabled = false;
             }
         });
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // Handle performance link click
-            document.querySelector('a[href="#performance"]').addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Switch to benchmark tab
-                document.querySelectorAll('.service-tab').forEach(t => {
-                    t.classList.remove('border-blue-500', 'text-blue-600');
-                    t.classList.add('border-transparent', 'text-gray-500');
-                });
-                
-                document.querySelector('[data-tab="benchmark"]').classList.add('border-blue-500', 'text-blue-600');
-                document.querySelector('[data-tab="benchmark"]').classList.remove('border-transparent', 'text-gray-500');
-                
-                // Show benchmark content
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.add('hidden');
-                });
-                document.getElementById('benchmark-tab').classList.remove('hidden');
-                
-                // Scroll to the section
-                document.getElementById('performance').scrollIntoView({ behavior: 'smooth' });
-            });
-            
             initChart();
+            updateWorkerIndicators();
             
-            // Set CPU count in hero section
-            fetch('/api/benchmark/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({
-                    text: 'test',
-                    iterations: 1
-                })
-            }).then(response => response.json())
-            .then(data => {
-                if (data.system_info && data.system_info.cpu_count) {
-                    document.getElementById('cpu-count').textContent = data.system_info.cpu_count;
-                }
-            }).catch(() => {
-                // Ignore errors for this non-critical feature
-            });
+            // Update worker indicators when settings change
+            document.getElementById('numWorkers').addEventListener('change', updateWorkerIndicators);
+            document.getElementById('processingMethod').addEventListener('change', updateWorkerIndicators);
         });
     </script>
 </body>
