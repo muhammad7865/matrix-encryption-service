@@ -21,8 +21,6 @@ INSTALLED_APPS = [
     'authentication',
     'encryption_api',
     'analytics',
-    'file_processing',
-    'service_management',
 ]
 
 MIDDLEWARE = [
